@@ -1,21 +1,7 @@
+# Beyond Supervision Demo Platform - V0.1
 
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# Beyond Supervision Demo Platform - V0.0
-
-**Version:** 0.0 (Updated Structure)
-**Date:** 2025-04-25
+**Version:** 0.1
+**Date:** 2025-06-18
 
 ## 1. Overview
 
@@ -39,11 +25,22 @@ The platform aims to demonstrate support for the following core supervisory func
 ## 3. Technical Stack & Structure
 
 * **Frontend Framework:** React
-* **Build Tool / Dev Environment:** Vite (Chosen for fast development server and optimized builds)
+* **Build Tool / Dev Environment:** Vite (with SWC)
 * **Layout:** Based on the provided `Layout.js` and `Sidebar.js` components, featuring a fixed left-hand sidebar for navigation (reflecting the new structure) and a main content area.
-* **Styling:** Tailwind CSS (Planned, based on existing class names and desired look/feel from screenshots). Responsiveness for tablet/laptop sizes is key.
-* **State Management:** Likely involves React Context or a dedicated state management library for managing application-wide state and potentially nested navigation state.
-* **API Integration:** Plan for numerous API calls. Utilize environment variables (`.env` files supported by Vite) to manage different API endpoints (dev, staging, prod). Consider using an HTTP client library like `axios` for streamlined requests and error handling.
+* **Styling:** Tailwind CSS (with custom theme extensions for UI consistency).
+* **State Management:** Primarily uses React Context (e.g., `WorkflowContext` for global workflow states) and local component state. Feature-specific data and API interactions are handled within co-located service files (e.g., `licensingService.js`).
+* **Navigation**: Custom state-driven navigation managed in `App.jsx` to switch between main modules/views.
+* **API Integration**: The React frontend communicates with the Express.js backend via RESTful APIs. These API calls are typically encapsulated within JavaScript service files co-located with feature components (e.g., `licensingService.js`, `reportingService.js`).
+*   **Backend Stack:**
+    *   **Framework:** Express.js (Node.js)
+    *   **Language:** JavaScript (Node.js)
+    *   **Core AI Integration:** Google Gemini API (currently using `gemini-2.0-flash-exp` for template generation and `gemini-1.5-flash-latest` for analytics).
+    *   **Key Features:**
+        *   Real-time AI template generation with Server-Sent Events (SSE).
+        *   AI-powered analytics over structured CSV data, returning JSON (for scalars, tables, and chart configurations).
+        *   On-the-fly PDF and DOCX generation from template content (`pdfkit`, `docx`).
+        *   In-memory data caching for analytics (data loaded from CSV files in `ai-template-backend/scripts/`).
+        *   In-memory storage for AI-generated templates.
 
 ## 4. Key Design Considerations
 
@@ -60,88 +57,102 @@ The platform aims to demonstrate support for the following core supervisory func
 
 ## 5. Module Breakdown (Functionality by Sidebar Hierarchy - Revision 2)
 
-This section details planned functionality. A separate **Dashboard** (landing page) and **Settings** module are also assumed unless specified otherwise.
+This section describes the intended functional structure of the platform. Current implementation status varies by module, with core features developed for Licensing, Management, Reporting, and Regulatory Updates. Other areas are placeholders.
 
 * **5.0. Dashboard** (Top-level landing page)
     * **Purpose:** High-level overview post-login.
-    * **Key Features:** Summary Widgets (Risk Alerts, Tasks Due, Recent Submissions), Quick Access Links, Recent Activity Feeds.
+    * **Key Features:** Summary Widgets (Risk Alerts, Tasks Due, Recent Submissions), Quick Access Links, Recent Activity Feeds. (Currently a placeholder page with a `DevRoadmapBanner`).
 
-* **5.1. Regulatory Review Mgmt.**
-    * **Purpose:** Manage incoming submissions, applications, related communication, and internal review processes.
+* **5.1. Licensing & Applications**
+    * **Purpose:** Manage the lifecycle of licensing applications, from submission to review and issuance.
+    * **Implemented Features (Partial):** `LicensingDashboardPage` providing an overview, `NewApplicationPage` for submitting new applications, `ApplicationsTable` for viewing and managing existing applications.
+    * **Conceptual Features:** Workflow integration for review processes, detailed application tracking.
+
+* **5.2. Management & Configuration**
+    * **Purpose:** Centralized control for administrators to manage platform templates, workflows, forms, and view system metrics.
+    * **Implemented Features (Partial):** `ManagePage` which consolidates:
+        * `TemplateManagement`: For creating, editing, and organizing various document and communication templates.
+        * `WorkflowManagement`: For defining and overseeing review and approval workflows.
+        * `ApplicationFormManagement`: For designing and managing dynamic forms used in applications.
+        * `MetricsManagement`: For viewing platform usage and performance metrics.
+    * **Conceptual Features:** More granular control over user roles and permissions.
+
+* **5.3. Reporting & Submissions**
+    * **Purpose:** Handle intake, validation, and analysis of regulatory reports submitted by entities.
+    * **Implemented Features (Partial):** `ReportsDashboardPage` for an overview of reporting activities.
+    * **Conceptual Features:** Detailed submission tracking, automated validation against predefined rules, tools for report analysis.
+
+* **5.4. Regulatory Updates**
+    * **Purpose:** Disseminate and track new regulations, guidelines, and communications to supervised entities.
+    * **Implemented Features (Partial):** `RegulatoryUpdatesDashboardPage` for viewing and managing updates.
+    * **Conceptual Features:** Entity acknowledgment tracking, integration with communication tools.
+
+* **5.5. Settings**
+    * **Purpose:** Platform administration and user-specific configuration.
+    * **Implemented Features (Placeholder):** Basic navigation tab present in `App.jsx`.
+    * **Conceptual Features:** User Management, Role/Permission Management, System Configuration, Localization, Notification Preferences.
+
+
+* **5.6. Risk Assessments (Conceptual)**
+    * **Purpose:** Analyze entity and systemic risk using various data points and tools. Includes viewing the entity context. (Currently shows `DevRoadmapBanner`)
     * **Sub-Functions / Features:**
-        * **Reporting Intake Portal:** View required reports, track submission status (Pending, Received, Overdue), entity submission interface (Upload/Validate/Submit), submission history. *(Mapped from old 'Reporting')*
-        * **Application Intake (Licensing, etc.):** Portal/workflow for entities submitting applications (New License, Fit & Proper, etc.). *(Mapped from old 'Entities & Licensing')*
-        * **Review Workflows:** Internal task lists/dashboards for assigned reviews (reports, applications), workflow templates, status tracking, efficiency analytics. *(Mapped from old 'Workflows')*
-        * **Correspondence Hub:** Secure messaging linked to specific reviews, submissions, or entities. *(Mapped from old 'Correspondence')*
+        * *_(Placeholder)_* Company Profile / Entity View: Detailed view of an entity's information.
+        * *_(Placeholder)_* Off-Site Monitoring & Analysis: KRI dashboards, Threshold breach alerts.
+        * *_(Placeholder)_* Risk Scoring & Profiling: Define methodologies, Generate/adjust composite risk scores.
+        * *_(Placeholder)_* Risk Analytics & Visualization: Interactive dashboards, Heatmaps, Trendlines.
 
-* **5.2. Risk Assessments**
-    * **Purpose:** Analyze entity and systemic risk using various data points and tools. Includes viewing the entity context.
+* **5.7. Compliance Monitoring (Conceptual)**
+    * **Purpose:** Verify and enforce adherence to specific regulatory requirements and rules. (Currently shows `DevRoadmapBanner`)
     * **Sub-Functions / Features:**
-        * **Company Profile / Entity View:** Detailed view of an entity's information (Basic Info, Ownership, Licensing Status, Compliance/Risk History). *(Mapped from old 'Entities & Licensing')*
-        * **Off-Site Monitoring & Analysis:** KRI dashboards, Threshold breach alerts, Logging supervisor reviews/notes, Follow-up actions. *(Mapped from old 'Supervision')*
-        * **Risk Scoring & Profiling:** Define methodologies, Generate/adjust composite risk scores (using quantitative/qualitative data), Maintain assessment history. *(Mapped from old 'Risk Management')*
-        * **Risk Analytics & Visualization:** Interactive dashboards (Filters: Sector, Risk, Date), Heatmaps, Trendlines, Risk Distribution Graphs, Top Risk Lists. *(Mapped from old 'Analytics')*
-        * **Unstructured Data Analysis (for Risk):** Conceptual tools (NLP/ML) to extract risks from documents (reports, policies, ICAAP/ORSA, emails). *(Mapped from 'Advanced Capabilities')*
-        * **DeFi / Embedded Supervision Monitoring:** Conceptual views showing real-time data/compliance from integrated protocols. *(Mapped from 'Advanced Capabilities')*
+        * *_(Placeholder)_* Automated Compliance Checks: Cross-validation of submitted data.
+        * *_(Placeholder)_* Thematic Compliance Reviews: Tools for targeted reviews.
+        * *_(Placeholder)_* Compliance Status Views: Dashboards showing overall compliance posture.
+        * *_(Placeholder)_* Licensing Status Management: View/update license validity.
 
-* **5.3. Compliance Monitoring**
-    * **Purpose:** Verify and enforce adherence to specific regulatory requirements and rules.
+* **5.8. Onsite Examinations (Conceptual)**
+    * **Purpose:** Manage the end-to-end process for physical or virtual site inspections. (Currently shows `DevRoadmapBanner`)
     * **Sub-Functions / Features:**
-        * **Automated Compliance Checks:** Cross-validation of submitted data/documents against configured rules (applied during Intake or specific checks). *(Mapped from 'Advanced Capabilities')*
-        * **Thematic Compliance Reviews:** Tools to conduct targeted reviews across multiple entities for specific regulations (e.g., AML/CFT checks). *(Partially from old 'Reporting'/'Supervision')*
-        * **Compliance Status Views:** Dashboards showing overall compliance posture or status against specific regulations. *(New derived function)*
-        * **Licensing Status Management:** View/update license validity, conditions, and restrictions based on compliance. *(Partially from old 'Entities & Licensing')*
-        * **Custom Forms/Surveys (for Compliance):** Deploy and analyze targeted compliance questionnaires. *(Mapped from 'Advanced Capabilities')*
+        * *_(Placeholder)_* Planning & Scheduling.
+        * *_(Placeholder)_* Team & Resource Management.
+        * *_(Placeholder)_* Execution & Fieldwork Support.
+        * *_(Placeholder)_* Findings & Reporting.
+        * *_(Placeholder)_* Audit Metrics & History.
 
-* **5.4. Onsite Examinations**
-    * **Purpose:** Manage the end-to-end process for physical or virtual site inspections.
-    * **Sub-Functions / Features:**
-        * **Planning & Scheduling:** Create Exam Plans (Scope, Objectives, Docs, Schedule).
-        * **Team & Resource Management:** Assign teams.
-        * **Execution & Fieldwork Support:** Track status, Manage info requests, Secure document sharing, Offline/Online task support.
-        * **Findings & Reporting:** Upload/manage findings, Generate reports.
-        * **Audit Metrics & History:** View key metrics, Access past exam records. *(Mapped directly from old 'Audit / Examination')*
-
-* **5.5. Market Conduct**
-    * **Purpose:** Supervise how firms conduct business, treat customers, and interact with the market.
+* **5.9. Market Conduct (Conceptual)**
+    * **Purpose:** Supervise how firms conduct business, treat customers, and interact with the market. (Currently shows `DevRoadmapBanner`)
     * **Sub-Functions / Features:**
         * *_(Placeholder)_* Complaints Handling & Analysis.
         * *_(Placeholder)_* Sales Practices Review & Monitoring.
         * *_(Placeholder)_* Product Oversight Tools.
         * *_(Placeholder)_* Advertising & Disclosure Review.
 
-* **5.6. Enforcement**
-    * **Purpose:** Manage actions taken in response to breaches or non-compliance.
+* **5.10. Enforcement (Conceptual)**
+    * **Purpose:** Manage actions taken in response to breaches or non-compliance. (Currently shows `DevRoadmapBanner`)
     * **Sub-Functions / Features:**
         * *_(Placeholder)_* Enforcement Case Initiation & Management.
         * *_(Placeholder)_* Tracking of Actions (Warnings, Penalties, Remediation Plans).
         * *_(Placeholder)_* Reporting on Enforcement Activities & Outcomes.
-        * *_(Placeholder)_* Linkage to findings from Risk, Compliance, Exams, Market Conduct.
 
-* **5.7. Macro Supervision**
-    * **Purpose:** Monitor and analyze the financial system at a systemic level.
+* **5.11. Macro Supervision (Conceptual)**
+    * **Purpose:** Monitor and analyze the financial system at a systemic level. (Currently shows `DevRoadmapBanner`)
     * **Sub-Functions / Features:**
-        * **Systemic Risk Dashboards:** Monitor aggregate indicators, interconnectedness, sentiment analysis (conceptual).
-        * **Sector-Wide Analytics & Reporting:** Aggregate reporting data for trend analysis and regulatory reporting. *(Partially from old 'Analytics')*
-        * **Stress Testing Analysis (Aggregate):** Tools to analyze system-wide resilience based on submitted stress tests.
-        * **Policy Impact Simulation Tools (Conceptual):** Model effects of regulatory changes.
+        * *_(Placeholder)_* Systemic Risk Dashboards.
+        * *_(Placeholder)_* Sector-Wide Analytics & Reporting.
+        * *_(Placeholder)_* Stress Testing Analysis (Aggregate).
+        * *_(Placeholder)_* Policy Impact Simulation Tools.
 
-* **5.8. Settings** (Likely accessed via gear icon or user menu)
-    * **Purpose:** Platform administration and configuration.
-    * **Sub-Functions / Features:** User Management, Role/Permission Management, System Config, Localization, Template Management (Reports, Workflows, Forms). *(Mapped from old 'Settings' concept)*
+## 6. Advanced Capabilities
 
-## 6. Advanced Capabilities (To be demonstrated conceptually)
-
-* **Automated Compliance Checks:** System cross-validates submitted data/documents against configured rules/guidelines (Mapped under Compliance Monitoring).
-* **Custom Forms/Surveys:** Ability for supervisors to create, deploy, and analyze responses (Mapped under Compliance Monitoring, potentially elsewhere too).
-* **Unstructured Data Analysis:** Using NLP/ML concepts to summarize and extract key information/risks (Mapped under Risk Assessments).
-* **DeFi Embedded Supervision:** Conceptual dashboard elements showing real-time data/compliance (Mapped under Risk Assessments).
+* **AI-Powered Template Generation:** The system can generate various types of regulatory templates (e.g., checklists, policy documents, communication drafts) using prompts to the Gemini API. Responses are streamed in real-time. Generated templates can be downloaded as PDF or DOCX.
+* **AI-Powered Data Analytics:** Users can ask natural language questions about platform data (currently from CSV sources like licenses, applications, entities). The backend uses the Gemini API to process these queries and return structured JSON responses, suitable for displaying as text, tables, or charts (using Chart.js on the frontend).
+* **Unstructured Data Analysis (Conceptual):** Future capability to use NLP/ML to extract insights from uploaded documents. Current AI analytics focus on structured CSV data.
+* **Automated Compliance Checks (Conceptual):** System cross-validates submitted data/documents against configured rules/guidelines.
+* **Custom Forms/Surveys:** Initial steps towards this are implemented with `ApplicationFormManagement` and `ApplicationFormDesignerModal` within the Management & Configuration module, allowing for the design of dynamic forms.
+* **DeFi Embedded Supervision (Conceptual):** Conceptual dashboard elements showing real-time data/compliance from integrated protocols.
 
 ## 7. Future Considerations / V0.1 Goals
 
 * Develop interactive React components reflecting the **new sidebar hierarchy**.
-* Implement routing to handle navigation between these sections/subsections.
-* Update `Sidebar.jsx` and `App.jsx` to match the new structure.
-* Create mock data structures.
+* Implement routing to handle navigation between these sections/subsections. (Currently uses state-based navigation; `react-router-dom` or similar could be adopted for more complex routing needs).
+* Expand and refine mock data structures.
 * Build out core functionality within one or two subsections (e.g., Entity Management, Off-Site Monitoring).
->>>>>>> 9f97d26823ff9b29c636d25ee39ce4a694170f6b
